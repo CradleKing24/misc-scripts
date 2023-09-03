@@ -45,6 +45,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run:  gh extension install actions/gh-actions-cache
       - name: list cache
-        run: gh actions-cache list
+        run: gh actions-cache list -B
       - name: print hello
         run: echo "Hello cleanup"
