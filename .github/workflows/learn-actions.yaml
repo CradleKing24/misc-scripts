@@ -41,6 +41,8 @@ jobs:
     needs: [ temp-job-2, temp-job-3 ]
     if: ${{ always() }}
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - uses: actions/checkout@v3
       
