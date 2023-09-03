@@ -1,0 +1,64 @@
+name: learn-actions
+run-name: ${{ github.actor }} is learning GitHub Actions
+on: [push]
+jobs:
+  echo-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: print hello
+        run: echo "Hello from echo-messages" > ~/hello.txt
+      - name: cache test message
+        id: cache-message
+        uses: actions/cache@v3
+        with:
+          path: ~/hello.txt
+          key: ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }}
+  temp-job-2:
+    needs: echo-message
+    runs-on: ubuntu-latest
+    steps:
+      - name: get cache message
+        id: cache-message
+        uses: actions/cache@v3
+        with:
+          path: ~/hello.txt
+          key: ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }}
+      - name: print cache message
+        run: cat ~/hello.txt
+  temp-job-3:
+    needs: echo-message
+    runs-on: ubuntu-latest
+    steps:
+      - name: get cache message
+        id: cache-message
+        uses: actions/cache@v3
+        with:
+          path: ~/hello.txt
+          key: ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }}
+      - name: print cache message
+        run: cat ~/hello.txt
+  cleanup-job:
+    needs: [ temp-job-2, temp-job-3 ]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: install gh cache extention
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run:  gh extension install actions/gh-actions-cache
+      - name: list extensions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh extension list
+      - name: list cache
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh actions-cache list --repo CradleKing24/misc-scripts
+      - name: cleanup cache for run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh actions-cache delete ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }} --confirm
