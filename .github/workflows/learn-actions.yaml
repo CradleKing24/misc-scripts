@@ -26,7 +26,7 @@ jobs:
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/hello.txt
-          key: ${{ github.ref_name }}-build-${{ github.run_attempt }}
+          key: ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }}
       - name: print cache message
         run: cat ~/hello.txt
   temp-job-3:
@@ -47,6 +47,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run:  gh extension install actions/gh-actions-cache
       - name: list cache
-        run: gh actions-cache list -B ${{ github.ref_name }}
+        run: gh actions-cache list
       - name: print hello
         run: echo "Hello cleanup"
