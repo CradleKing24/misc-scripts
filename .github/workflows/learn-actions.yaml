@@ -47,6 +47,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run:  gh extension install actions/gh-actions-cache
       - name: list cache
-        run: gh actions-cache list
+        run: gh actions-cache list --repo CradleKing24/misc-scripts
       - name: print hello
         run: echo "Hello cleanup"
