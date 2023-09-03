@@ -11,11 +11,8 @@ jobs:
         id: cache-message
         uses: actions/cache@v3
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/hello.txt
           key: ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }}
-      - name: sleep for 5s
-        run: sleep 5s
   temp-job-2:
     needs: echo-message
     runs-on: ubuntu-latest
@@ -24,7 +21,6 @@ jobs:
         id: cache-message
         uses: actions/cache@v3
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/hello.txt
           key: ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }}
       - name: print cache message
@@ -33,8 +29,14 @@ jobs:
     needs: echo-message
     runs-on: ubuntu-latest
     steps:
-      - name: print hello
-        run: echo "Hello job 3"
+      - name: get cache message
+        id: cache-message
+        uses: actions/cache@v3
+        with:
+          path: ~/hello.txt
+          key: ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }}
+      - name: print cache message
+        run: cat ~/hello.txt
   cleanup-job:
     needs: [ temp-job-2, temp-job-3 ]
     if: ${{ always() }}
@@ -54,5 +56,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh actions-cache list --repo CradleKing24/misc-scripts
-      - name: print hello
-        run: echo "Hello cleanup"
+      - name: cleanup cache for run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh actions-cache delete ${{ github.ref_name }}-build-${{ github.run_number }}-${{ github.run_attempt }} --confirm
