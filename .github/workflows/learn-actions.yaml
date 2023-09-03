@@ -6,17 +6,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: print hello
-        run: echo "Hello"
-      - name: cache message
-        run: echo "todo cache a message"
+        run: echo "Hello from echo-messages" > ~/hello.txt
+      - name: cache test message
+        id: cache-message
+        uses: actions/cache@v3
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/hello.txt
+          key: ${{ github.ref_name }}-build-${{ github.run_id }}
       - name: sleep for 5s
         run: sleep 5s
   temp-job-2:
     needs: echo-message
     runs-on: ubuntu-latest
     steps:
-      - name: print hello
-        run: echo "Hello job 2"
+      - name: get cache message
+        id: cache-message
+        uses: actions/cache@v3
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/hello.txt
+          key: ${{ github.ref_name }}-build-${{ github.run_id }}
+      - name: print cache message
+        run: cat ~/hello.txt
   temp-job-3:
     needs: echo-message
     runs-on: ubuntu-latest
