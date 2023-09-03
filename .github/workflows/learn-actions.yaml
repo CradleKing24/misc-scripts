@@ -13,7 +13,7 @@ jobs:
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/hello.txt
-          key: ${{ github.ref_name }}-build-${{ github.run_id }}
+          key: ${{ github.ref_name }}-build-${{ github.run_attempt }}
       - name: sleep for 5s
         run: sleep 5s
   temp-job-2:
@@ -41,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: install gh cache extention
+        env:
+          GH_TOKEN: ${{ github.token }}
         run:  gh extension install actions/gh-actions-cache
       - name: list cache
         run: gh actions-cache list
