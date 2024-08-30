@@ -70,7 +70,7 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
 date_span(date(2024, 9, 4), date(2025, 4, 9), timedelta(weeks=1))
 
 # write schedule out into formatted file
-f = open("temp.txt", "w")
+f = open("schedule.txt", "w")
 for key in bowling_schedule:
     f.write(f"{key},")
     for x in bowling_schedule[key]:
