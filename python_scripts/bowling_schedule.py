@@ -12,12 +12,12 @@ players = [
 ]
 players_unavailable = {
     "Jaron Turner": [
-        date(2024, 9, 4),
-        date(2024, 9, 11),
-        date(2024, 9, 18),
         date(2024, 9, 25),
         date(2024, 10, 30),
         date(2024, 11, 27),
+        date(2025, 1, 29),
+        date(2025, 2, 26),
+        date(2025, 3, 26),
     ],
     "Justin Ellefson": [date(2024, 10, 2), date(2024, 10, 9)],
     "Gina Woolfrey": [],
