@@ -7,6 +7,7 @@ players = [
     "Justin Ellefson",
     "Gina Woolfrey",
     "Brenna Pasch",
+    "Stephanie Roy",
     # "Charles King",
     # "Corey Quick",
 ]
@@ -20,9 +21,16 @@ players_unavailable = {
         date(2025, 3, 26),
     ],
     "Justin Ellefson": [date(2024, 10, 2), date(2024, 10, 9)],
-    "Gina Woolfrey": [],
+    "Gina Woolfrey": [
+        date(2024, 9, 11),
+        date(2024, 9, 18),
+        date(2024, 10, 2),
+        date(2024, 10, 9),
+        date(2024, 10, 23),
+    ],
     "Brenna Pasch": [],
     "Erik LaVanier": [],
+    "Stephanie Roy": [],
 }
 bowling_schedule = {}
 
