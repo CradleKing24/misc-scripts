@@ -8,8 +8,6 @@ players = [
     "Gina Woolfrey",
     "Brenna Pasch",
     "Stephanie Roy",
-    # "Charles King",
-    # "Corey Quick",
 ]
 players_unavailable = {
     "Jaron Turner": [
@@ -28,7 +26,7 @@ players_unavailable = {
         date(2024, 10, 9),
         date(2024, 10, 23),
     ],
-    "Brenna Pasch": [],
+    "Brenna Pasch": [date(2024, 9, 18), date(2025, 1, 22)],
     "Erik LaVanier": [],
     "Stephanie Roy": [],
 }
