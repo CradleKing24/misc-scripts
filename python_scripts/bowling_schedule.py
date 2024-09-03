@@ -53,12 +53,13 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
             random.shuffle(temp_players)
             player = temp_players.pop(0)
             player_unavailable_dates = players_unavailable[player]
-            if currentDate in player_unavailable_dates:
+            while currentDate in player_unavailable_dates:
                 if len(temp_players) == 0:
                     temp_players = players.copy()
                     temp_players.remove(player)
                     random.shuffle(temp_players)
                 player = temp_players.pop(0)
+                player_unavailable_dates = players_unavailable[player]
             # if player is already playing on the date, loop until someone not on the date is chosen
             while player in players_on_date:
                 if len(temp_players) == 0:
