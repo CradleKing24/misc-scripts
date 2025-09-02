@@ -8,27 +8,56 @@ players = [
     "Gina Woolfrey",
     "Brenna Pasch",
     "Stephanie Roy",
+    "Sam Butler",
+    "Linnea Madera",
 ]
 players_unavailable = {
     "Jaron Turner": [
-        date(2024, 9, 25),
-        date(2024, 10, 30),
-        date(2024, 11, 27),
-        date(2025, 1, 29),
-        date(2025, 2, 26),
-        date(2025, 3, 26),
+        date(2025, 9, 24),
+        date(2025, 10, 29),
+        date(2025, 11, 26),
+        date(2026, 1, 28),
+        date(2026, 2, 25),
+        date(2026, 3, 25),
+        date(2026, 4, 1),
+        date(2026, 4, 8),
     ],
-    "Justin Ellefson": [date(2024, 10, 2), date(2024, 10, 9)],
+    "Justin Ellefson": [
+        date(2025, 9, 17),
+        date(2025, 11, 5),
+        date(2025, 12, 10),
+        date(2026, 1, 7),
+        date(2026, 3, 25),
+    ],
     "Gina Woolfrey": [
-        date(2024, 9, 11),
-        date(2024, 9, 18),
-        date(2024, 10, 2),
-        date(2024, 10, 9),
-        date(2024, 10, 23),
+        date(2025, 11, 12),
+        date(2025, 11, 19),
     ],
-    "Brenna Pasch": [date(2024, 9, 18), date(2025, 1, 22)],
+    "Brenna Pasch": [],
     "Erik LaVanier": [],
-    "Stephanie Roy": [],
+    "Sam Butler": [
+        date(2025, 9, 17),
+        date(2025, 11, 12),
+        date(2025, 11, 26),
+        date(2025, 12, 3),
+        date(2026, 3, 11),
+        date(2026, 4, 1),
+    ],
+    "Stephanie Roy": [
+        date(2025, 9, 24),
+        date(2025, 11, 19),
+    ],
+    "Linnea Madera": [
+        date(2025, 9, 17),
+        date(2025, 9, 24),
+        date(2025, 10, 1),
+        date(2025, 10, 29),
+        date(2025, 11, 26),
+        date(2025, 12, 17),
+        date(2026, 1, 7),
+        date(2026, 2, 11),
+        date(2026, 2, 18),
+    ],
 }
 bowling_schedule = {}
 
@@ -37,44 +66,51 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
     currentDate = startDate
     temp_players = players.copy()
     while currentDate <= endDate:
-        if currentDate == date(2024, 12, 25) or currentDate == date(
-            2025, 1, 1
+        if currentDate == date(2025, 12, 24) or currentDate == date(
+            2025, 12, 31
         ):  # this week is skipped for bowling
             currentDate += delta
             continue
-        if currentDate == date(2025, 1, 8):  # start of second half of the season
+        if currentDate == date(2026, 1, 7):  # start of second half of the season
             players.append("Erik LaVanier")
             temp_players = players.copy()
 
         players_on_date = []
-        for x in range(3):
-            random.shuffle(temp_players)
-            player = temp_players.pop(0)
-            player_unavailable_dates = players_unavailable[player]
-            while currentDate in player_unavailable_dates:
-                if len(temp_players) == 0:
-                    temp_players = players.copy()
-                    temp_players.remove(player)
-                    random.shuffle(temp_players)
-                player = temp_players.pop(0)
-                player_unavailable_dates = players_unavailable[player]
-            # if player is already playing on the date, loop until someone not on the date is chosen
-            while player in players_on_date:
-                if len(temp_players) == 0:
-                    temp_players = players.copy()
-                    random.shuffle(temp_players)
-                player = temp_players.pop(0)
+        for _ in range(3):
+            # filter out unavailable players and already scheduled ones
+            eligible_players = [
+                p for p in temp_players
+                if currentDate not in players_unavailable.get(p, [])
+                and p not in players_on_date
+            ]
+
+            if not eligible_players:
+                # fallback: reset pool from master list
+                eligible_players = [
+                    p for p in players
+                    if currentDate not in players_unavailable.get(p, [])
+                    and p not in players_on_date
+                ]
+
+            if not eligible_players:
+                raise RuntimeError(f"No available players for {currentDate}")
+
+            random.shuffle(eligible_players)
+            player = eligible_players.pop(0)
+
             players_on_date.append(player)
 
-            bowling_schedule[currentDate] = players_on_date.copy()
-            if len(temp_players) == 0:
+            # remove selected player from temp pool
+            temp_players = [p for p in temp_players if p != player]
+            if not temp_players:
                 temp_players = players.copy()
 
+        bowling_schedule[currentDate.strftime("%m/%d/%Y")] = players_on_date.copy()
         currentDate += delta
 
 
-# bowling is Sept 4th 2024 - April 9rd 2025. No bowling Dec. 25th 2024, Jan 1 2025
-date_span(date(2024, 9, 4), date(2025, 4, 9), timedelta(weeks=1))
+# bowling is Sept 3rd 2025 - April 8th 2026. No bowling Dec. 24th 2025, Dec. 31 2025
+date_span(date(2025, 9, 10), date(2026, 4, 8), timedelta(weeks=1))
 
 # write schedule out into formatted file
 f = open("schedule.txt", "w")
