@@ -152,7 +152,7 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
 date_span(date(2025, 9, 17), date(2026, 4, 8), timedelta(weeks=1))
 
 # write schedule out into formatted file
-with open("schedule2.txt", "w") as f:
+with open("schedule.txt", "w") as f:
     for key in bowling_schedule:
         f.write(f"{key},")
         for x in bowling_schedule[key]:
