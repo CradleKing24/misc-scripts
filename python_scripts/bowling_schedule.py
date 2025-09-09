@@ -1,16 +1,19 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 import random
+from collections import defaultdict
 
+# Players with frequency preference
+# frequency can be "MONTHLY" or "ANY"
+players = {
+    "Jaron Turner": "ANY",
+    "Justin Ellefson": "ANY",
+    "Gina Woolfrey": "ANY",
+    "Brenna Pasch": "ANY",
+    "Stephanie Roy": "ANY",
+    "Sam Butler": "MONTHLY",
+    "Linnea Madera": "MONTHLY",
+}
 
-players = [
-    "Jaron Turner",
-    "Justin Ellefson",
-    "Gina Woolfrey",
-    "Brenna Pasch",
-    "Stephanie Roy",
-    "Sam Butler",
-    "Linnea Madera",
-]
 players_unavailable = {
     "Jaron Turner": [
         date(2025, 9, 24),
@@ -59,37 +62,52 @@ players_unavailable = {
         date(2026, 2, 18),
     ],
 }
+
 bowling_schedule = {}
+
+# Track monthly assignments: {(year, month): {player: count}}
+monthly_assignments = defaultdict(lambda: defaultdict(int))
 
 
 def date_span(startDate, endDate, delta=timedelta(days=1)):
     currentDate = startDate
-    temp_players = players.copy()
+    temp_players = list(players.keys())
     while currentDate <= endDate:
-        if currentDate == date(2025, 12, 24) or currentDate == date(
-            2025, 12, 31
-        ):  # this week is skipped for bowling
+        # skip holiday weeks
+        if currentDate in (date(2025, 12, 24), date(2025, 12, 31)):
             currentDate += delta
             continue
-        if currentDate == date(2026, 1, 7):  # start of second half of the season
-            players.append("Erik LaVanier")
-            temp_players = players.copy()
+
+        # add new player mid-season
+        if currentDate == date(2026, 1, 7):
+            players["Erik LaVanier"] = "ANY"
+            temp_players = list(players.keys())
 
         players_on_date = []
+        year_month = (currentDate.year, currentDate.month)
+
         for _ in range(3):
-            # filter out unavailable players and already scheduled ones
+            # filter out unavailable + already scheduled + monthly frequency limit
             eligible_players = [
                 p for p in temp_players
                 if currentDate not in players_unavailable.get(p, [])
                 and p not in players_on_date
+                and not (
+                    players[p] == "MONTHLY"
+                    and monthly_assignments[year_month][p] >= 1
+                )
             ]
 
             if not eligible_players:
                 # fallback: reset pool from master list
                 eligible_players = [
-                    p for p in players
+                    p for p in players.keys()
                     if currentDate not in players_unavailable.get(p, [])
                     and p not in players_on_date
+                    and not (
+                        players[p] == "MONTHLY"
+                        and monthly_assignments[year_month][p] >= 1
+                    )
                 ]
 
             if not eligible_players:
@@ -100,23 +118,25 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
 
             players_on_date.append(player)
 
-            # remove selected player from temp pool
+            # record assignment
+            monthly_assignments[year_month][player] += 1
+
+            # remove from temp pool
             temp_players = [p for p in temp_players if p != player]
             if not temp_players:
-                temp_players = players.copy()
+                temp_players = list(players.keys())
 
         bowling_schedule[currentDate.strftime("%m/%d/%Y")] = players_on_date.copy()
         currentDate += delta
 
 
-# bowling is Sept 3rd 2025 - April 8th 2026. No bowling Dec. 24th 2025, Dec. 31 2025
+# bowling is Sept 10th 2025 - April 8th 2026
 date_span(date(2025, 9, 10), date(2026, 4, 8), timedelta(weeks=1))
 
 # write schedule out into formatted file
-f = open("schedule.txt", "w")
-for key in bowling_schedule:
-    f.write(f"{key},")
-    for x in bowling_schedule[key]:
-        f.write(f"{x},")
-    f.write("\n")
-f.close()
+with open("schedule2.txt", "w") as f:
+    for key in bowling_schedule:
+        f.write(f"{key},")
+        for x in bowling_schedule[key]:
+            f.write(f"{x} ({players[x]}),")
+        f.write("\n")
