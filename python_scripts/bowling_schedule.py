@@ -72,10 +72,13 @@ monthly_assignments = defaultdict(lambda: defaultdict(int))
 def date_span(startDate, endDate, delta=timedelta(days=1)):
     currentDate = startDate
     temp_players = list(players.keys())
+    prev_week_players = []  # track who bowled last week
+
     while currentDate <= endDate:
         # skip holiday weeks
         if currentDate in (date(2025, 12, 24), date(2025, 12, 31)):
             currentDate += delta
+            prev_week_players = []  # reset, since no game that week
             continue
 
         # add new player mid-season
@@ -87,7 +90,7 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
         year_month = (currentDate.year, currentDate.month)
 
         for _ in range(3):
-            # filter out unavailable + already scheduled + monthly frequency limit
+            # Step 1: try excluding last week’s players
             eligible_players = [
                 p for p in temp_players
                 if currentDate not in players_unavailable.get(p, [])
@@ -96,10 +99,12 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
                     players[p] == "MONTHLY"
                     and monthly_assignments[year_month][p] >= 1
                 )
+                and p not in prev_week_players  # try to avoid repeats
             ]
 
+            # Step 2: if not enough players, relax rule and allow last week’s players
             if not eligible_players:
-                # fallback: reset pool from master list
+                # fallback: allow last week’s players too, so use full player pool
                 eligible_players = [
                     p for p in players.keys()
                     if currentDate not in players_unavailable.get(p, [])
@@ -116,9 +121,7 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
             random.shuffle(eligible_players)
             player = eligible_players.pop(0)
 
-            players_on_date.append(player)
-
-            # record assignment
+            players_on_date.append(player)  # ✅ FIX: add to the lineup
             monthly_assignments[year_month][player] += 1
 
             # remove from temp pool
@@ -126,7 +129,10 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
             if not temp_players:
                 temp_players = list(players.keys())
 
+        # save schedule and update prev week players
         bowling_schedule[currentDate.strftime("%m/%d/%Y")] = players_on_date.copy()
+        prev_week_players = players_on_date.copy()
+
         currentDate += delta
 
 
