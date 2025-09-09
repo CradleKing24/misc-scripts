@@ -99,7 +99,7 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
                     players[p] == "MONTHLY"
                     and monthly_assignments[year_month][p] >= 1
                 )
-                and not (p in prev_week_players and p in prev2_week_players)  # 🚫 no 3 weeks in a row
+                and not (p in prev_week_players and p in prev2_week_players)
                 and p not in prev_week_players  # soft avoid back-to-back
             ]
 
@@ -113,7 +113,7 @@ def date_span(startDate, endDate, delta=timedelta(days=1)):
                         players[p] == "MONTHLY"
                         and monthly_assignments[year_month][p] >= 1
                     )
-                    and not (p in prev_week_players and p in prev2_week_players)  # 🚫 still block 3rd week
+                    and not (p in prev_week_players and p in prev2_week_players)
                 ]
 
             # Step 3: absolute fallback (if schedule would fail) — allow anyone
@@ -156,5 +156,5 @@ with open("schedule.txt", "w") as f:
     for key in bowling_schedule:
         f.write(f"{key},")
         for x in bowling_schedule[key]:
-            f.write(f"{x} ({players[x]}),")
+            f.write(f"{x},")
         f.write("\n")
